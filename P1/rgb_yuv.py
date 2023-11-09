@@ -7,13 +7,17 @@ def rgb_to_yuv(r, g, b):
     Convert RGB values to YUV. JPEG/YUV Color Space
 
     Args:
-        r (int): Red component (0-255).
-        g (int): Green component (0-255).
-        b (int): Blue component (0-255).
+        r (int): Red component (0-1).
+        g (int): Green component (0-1).
+        b (int): Blue component (0-1).
 
     Returns:
         tuple: YUV values as (Y, U, V).
     """
+
+    if r > 1 or g > 1 or b > 1:
+        raise ValueError("RGB values must be between 0 and 1.")
+
     y = 0.299 * r + 0.587 * g + 0.114 * b 
     u = 0.492 * (b - y)
     v = 0.877 * (r - y)
