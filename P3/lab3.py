@@ -2,6 +2,7 @@ import os
 import numpy as np
 import subprocess
 import sys
+import json
 sys.path.append('../')
 import P2.lab2 as p2
 
@@ -86,9 +87,8 @@ class VideoAnalyzer:
         subprocess.run([
             'ffmpeg',
             '-i', self.dir_path + self.input_filename_no_ext + '_audio.mp3',
-            '-ss', str(self.start_time),
             '-ac', '1',
-            '-ab', '320',
+            '-b:a', '320k',
             self.dir_path + self.input_filename_no_ext +  '_audio_mono.mp3',
             '-hide_banner'
         ])
@@ -97,9 +97,8 @@ class VideoAnalyzer:
         subprocess.run([
             'ffmpeg',
             '-i', self.dir_path + self.input_filename_no_ext + '_audio.mp3',
-            '-ss', str(self.start_time),
             '-ac', '2',
-            '-ab', '96',
+            '-b:a', '96k',
             self.dir_path + self.input_filename_no_ext +  '_audio_stereo.mp3',
             '-hide_banner'
         ])
@@ -117,7 +116,75 @@ class VideoAnalyzer:
             '-hide_banner'
         ])
 
-    #def package(self):
+    def create_mp4(self):
+        # Create the final mp4 file
+        subprocess.run([
+            'ffmpeg',
+            '-i', self.dir_path + self.input_filename_no_ext + '_only_video.mp4',
+            '-i', self.dir_path + self.input_filename_no_ext + '_audio_mono.mp3',
+            '-i', self.dir_path + self.input_filename_no_ext + '_audio_stereo.mp3',
+            '-i', self.dir_path + self.input_filename_no_ext + '_audio.aac',
+            '-map', '0:v',
+            '-map', '1:a',
+            '-map', '2:a',
+            '-map', '3:a',
+            '-c:v', 'copy',
+            '-c:a', 'copy',
+            self.dir_path + self.input_filename_no_ext + '_final.mp4',
+            '-hide_banner'
+        ])
+    """
+    Exercise 3:
+    Create another method which reads the tracks 
+    from an MP4 container, and it’s able to say how 
+    many tracks does the container contains
+
+    """
+    def get_tracks_info(self,path):
+        # Use FFmpeg to get information about tracks in the MP4 container
+        result = subprocess.run([
+            'ffprobe',
+            '-v', 'error',
+            '-show_entries', 'stream=index,codec_type',
+            '-of', 'json',
+            path
+        ], capture_output=True, text=True)
+
+        # Parse the JSON output from FFprobe
+        try:
+            data = json.loads(result.stdout)
+            streams = data.get('streams', [])
+            return streams
+        except json.JSONDecodeError:
+            print("Error decoding JSON output from FFprobe.")
+            return None
+        
+    def count_tracks(self,path=None):
+        # Count the number of tracks in the input video
+        if path is None:
+            path = self.input_path
+         # Get information about tracks
+        tracks_info = self.get_tracks_info(path)
+        
+
+
+        if tracks_info:
+            print("Number of tracks: {}".format(len(tracks_info)))
+            n_video_tracks = 0
+            n_audio_tracks = 0            
+            for track in tracks_info:
+                if track['codec_type'] == 'video':
+                    n_video_tracks += 1
+                elif track['codec_type'] == 'audio':
+                    n_audio_tracks += 1
+            print("Number of video tracks: {}".format(n_video_tracks))
+            print("Number of audio tracks: {}".format(n_audio_tracks))
+
+            
+        else:
+            print("Unable to retrieve track information.")
+
+    
 
 
 
