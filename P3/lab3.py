@@ -5,8 +5,8 @@ import sys
 import json
 sys.path.append('../')
 import P2.lab2 as p2
-
-
+import P3.subtitles_manager as sm
+import P3.histogram_yuv as hyuv
 #Exercise 1:
 """
 Cut 9 seconds from BBB. Start a Python script
@@ -16,13 +16,12 @@ that will show the macroblocks and the motion
 vectors
 """
 class VideoAnalyzer:
-    def __init__(self, input_path, output_path, start_time=0, duration=9):
+    def __init__(self, input_path, start_time=0, duration=9):
         self.input_filename = input_path.split("/")[-1]
         self.dir_path = input_path.split(self.input_filename)[0]
         self.input_filename_no_ext = self.input_filename.split(".")[0]
 
         self.input_path = input_path
-        self.outp_macroblock = output_path
         self.start_time = start_time
         self.duration = duration
 
@@ -37,12 +36,12 @@ class VideoAnalyzer:
             '-vf', 'codecview=mv=pf+bf+bb,drawgrid=w=16:h=16:t=2:c=red@0.5 ',
             '-c:a', 'copy',
             '-t', str(self.duration),
-            self.outp_macroblock,
+            self.dir_path + self.input_filename_no_ext + '_macroblock.mp4',
             '-hide_banner'
         ])
     def display_output(self):
         # Display the output video
-        subprocess.run(['ffplay', self.outp_macroblock])
+        subprocess.run(['ffplay', self.dir_path + self.input_filename_no_ext + '_macroblock.mp4', '-hide_banner'])
 
     # Exercise 2:
     """
@@ -133,6 +132,12 @@ class VideoAnalyzer:
             self.dir_path + self.input_filename_no_ext + '_final.mp4',
             '-hide_banner'
         ])
+        isdisp=input("Do you want to display the output video? (y/n): ")
+        if isdisp == "y":
+            subprocess.run(['ffplay', self.dir_path + self.input_filename_no_ext + '_final.mp4', '-hide_banner'])
+        else:
+            print("The video is saved in the data folder")
+
     """
     Exercise 3:
     Create another method which reads the tracks 
@@ -183,6 +188,29 @@ class VideoAnalyzer:
             
         else:
             print("Unable to retrieve track information.")
+    
+    def  integrate_subtitles(self):
+        # Download the subtitles
+        srt_path = sm.download_subtitles(self.input_path)
+        # Integrate the subtitles into the video
+        output_path_video_with_subtitles = sm.incorporate_subtitles(self.input_path, srt_path)
+        # Display the output video
+        resp = input("Do you want to display the output video? (y/n): ")
+        if resp == "y":
+            subprocess.run(['ffplay', output_path_video_with_subtitles, '-hide_banner'])
+        else:
+            print("The video is saved in the data folder")
+
+    def integrate_histogram(self):
+        video_w_histogram = hyuv.incorporate_histogram(self.input_path)
+        # Display the output video
+        resp = input("Do you want to display the output video? (y/n): ")
+        if resp == "y":
+            subprocess.run(['ffplay', video_w_histogram, '-hide_banner'])
+        else:
+            print("The video is saved in the data folder")
+    
+
 
     
 
