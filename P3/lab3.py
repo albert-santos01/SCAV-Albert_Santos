@@ -204,11 +204,8 @@ class VideoAnalyzer:
     def integrate_histogram(self):
         video_w_histogram = hyuv.incorporate_histogram(self.input_path)
         # Display the output video
-        resp = input("Do you want to display the output video? (y/n): ")
-        if resp == "y":
-            subprocess.run(['ffplay', video_w_histogram, '-hide_banner'])
-        else:
-            print("The video is saved in the data folder")
+        
+        print("The video is saved in the data folder as: " + video_w_histogram)
     
 
 
