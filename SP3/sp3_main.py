@@ -1,5 +1,7 @@
 from video_converter import VideoConverter
 import compare_videos as compVid
+import docker_ffmpeg_container as docker_ffmpeg
+import gui_video_processor as gui
 
 if __name__ == '__main__':
     input_path = "../data/sintel_short.mp4"
@@ -39,16 +41,19 @@ if __name__ == '__main__':
     print("\n \t Exercise 3: ")
     resp = input("Would you like to go to the GUI? (y/n)")
     if resp == "y":
-        from gui_video_processor import MyWindow
-        import sys
-        from PyQt5.QtWidgets import QApplication
-        app = QApplication(sys.argv)
-        window = MyWindow()
-        window.show()
-        sys.exit(app.exec_())
+        gui.main()
     else:
         print("Skipping this exercise")
     
     print("\n \t Exercise 4: ")
+    print("Using docker to change the resolution of the video")
+    response = input("Press Enter to continue or write [s] to skip... ")
+    if response != "s":
+        docker_ffmpeg.build_docker_image()
+        # docker_ffmpeg.run_docker_image()
+        docker_ffmpeg.run_ffmpeg_convert_resolution(input_path, 360, 240)
+    else:
+        print("Skipping this exercise")
+
     input("Press Enter to exit...")
     

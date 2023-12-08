@@ -158,6 +158,17 @@ class ConversionThread(QThread):
 
         self.finished.emit( output_file_path)
 
+def main():
+    # Create the application
+    app = QApplication(sys.argv)
+
+    # Create and show the main window
+    window = MyWindow()
+    window.show()
+
+    # Run the application
+    app.exec_()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
