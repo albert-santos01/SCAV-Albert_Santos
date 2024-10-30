@@ -1,5 +1,5 @@
 # SCAV by Albert Santos
-This is the respository for the course Audio and Video Encoding Systems, _Sistemes de Codifació d'Àudio i Vídeo_ in catalan.
+This is the respository for the course Audio and Video Encoding Systems, _Sistemes de Codifació d'Àudio i Vídeo (SCAV)_ in catalan.
 
 ## Usage
 To use each lab please go to folder of the lab considered and run the associated `%%_main.py`
